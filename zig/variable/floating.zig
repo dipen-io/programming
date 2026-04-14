@@ -10,7 +10,7 @@ pub fn main() !void {
     // f64
     const double: f64 = 3.141592653589793;
     // f128 - 128-bit float (quad precision)
-    const quad: f128 = 3.141592653589793238462643383279502884197;
+    // const quad: f128 = 3.141592653589793238462643383279502884197;
 
     std.debug.print("f16: {d:.2}\n", .{half});
     std.debug.print("f32: {d:.5}\n", .{single});
