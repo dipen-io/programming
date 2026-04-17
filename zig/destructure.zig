@@ -7,5 +7,13 @@ pub fn main() !void {
 
     const tuple = .{ 1, 2, 3 };
     x, y, z = tuple;
-    std.debug.print("tuple: x = {}, y = {}, z = {}\n", .{ x, y, z });
+    std.debug.print("Tuple: x = {}, y = {}, z = {}\n", .{ x, y, z });
+
+    const array = [_]u32{ 4, 5, 6 };
+    x, y, z = array;
+    std.debug.print("Array: x = {}, y = {}, z = {}\n", .{ x, y, z });
+
+    const vector: @Vector(3, u32) = .{ 7, 8, 9 };
+    x, y, z = vector;
+    std.debug.print("Vector: x = {}, y = {}, z = {}\n", .{ x, y, z });
 }
