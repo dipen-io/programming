@@ -3,10 +3,11 @@ const net = std.Io.net;
 
 const port: u32 = 5800;
 
-pub fn main() !void {
+pub fn main(init: std.process.Init) !void {
     var threaded: std.Io.Threaded = .init_single_threaded;
     defer threaded.deinit();
 
+    _ = init;
     const io = threaded.io();
 
     const addr = try net.IpAddress.parseIp4("127.0.0.1", port);
@@ -18,11 +19,11 @@ pub fn main() !void {
     defer server.deinit(io);
 
     std.debug.print("Listening on 127.0.0.1: {d}\n", .{port});
+
     while (true) {
         var conn = try server.accept(io);
         defer conn.close(io);
 
         std.debug.print("Client connected: {} \n", .{conn});
     }
-
 }
