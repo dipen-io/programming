@@ -5,6 +5,9 @@ pub fn main() !void {
     const language = "Zig";
     const year  = 2026;
 
+    const newNumnber = 11;
+    _=newNumnber; // we can't use this it is discarded
+
     std.debug.print("Learning {s} in {}\n", .{language, year});
 
     // basic arithmatic
