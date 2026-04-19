@@ -1,66 +1,79 @@
 const std = @import("std");
-const print = std.debug.print;
+const Io = std.Io;
 
-const argEnum = enum{
-    one,
-    two,
-    three
+const Contact = struct {
+    name: []const u8,
+    email: []const u8,
+    phone: []const u8,
 };
 
-const CSV_FILE = "contacts.csv";
+const Operation = struct {
+    list: []const u8,
+    add: []const u8,
+    remove: []const u8,
+    search: []const u8,
+};
 
+const FILE = "contact.csv";
 
 pub fn main(init: std.process.Init) !void {
+    const io = init.io;
 
-    // gives free allocator
-    const arena = init.arena.allocator();
+    // writer: io first, then buffer as empty slice literal
+    var stdout_writer = Io.File.stdout().writer(io, &.{});
+    const stdout = &stdout_writer.interface;
 
-    // gives all args as a slice
-    const args = try init.minimal.args.toSlice(arena);
+    var stdin_buf: [256]u8 = undefined;
+    // reader: io first, then buffer as empty slice literal
+    var stdin_reader = Io.File.stdin().reader(io, &stdin_buf);
+    const stdin = &stdin_reader.interface;
 
-    // because arg[0] gives program name and i don't want it
-    // using for
+    defer stdout.flush() catch {};
 
-    print("FOR:\n", .{});
-    for (args[1..]) |arg| {
-        print("executing command : {s}\n", .{arg});
-        if (std.mem.eql(u8, arg, "one")) {
-            one(arg);
-        }
-        else if (std.mem.eql(u8, arg, "ls")) {
-            two(arg);
-        }
-        else if (std.mem.eql(u8, arg, "three")) {
-            three(arg);
-        }
-        else {
-            print("Unknonw Command\n", .{});
-        }
-    }
-
-    // using switch (you can't direclty use switch on string)
-    const arg = args[1];
-    const cmd = std.meta.stringToEnum(argEnum, arg) orelse {
-        print("Unknonw command: {s}\n", .{arg});
-        return;
+    const op = Operation{
+        .list   = "list",
+        .add    = "add",
+        .remove = "remove",
+        .search = "search",
     };
-    print("SWITCH\n", .{});
-    switch (cmd) {
-        .one => one(arg),
-        .two => two(arg), 
-        .three => three(arg), 
+
+    while (true) {
+        try stdout.print("\n=== Operations ===\n", .{});
+        try stdout.print("1. {s}\n", .{op.list});
+        try stdout.print("2. {s}\n", .{op.add});    // bug fixed: was op.list
+        try stdout.print("3. {s}\n", .{op.remove});
+        try stdout.print("4. {s}\n", .{op.search});
+        try stdout.print("5. exit\n", .{});
+        try stdout.print("Enter Choice: ", .{});
+        try stdout.flush(); // flush before reading so prompt appears
+
+        if (stdin.takeDelimiterExclusive('\n')) |line| {
+            const choice = std.mem.trim(u8, line, "\r\n \t");
+
+            if (std.mem.eql(u8, choice, "1")) {
+                try stdout.print(">> Listing...\n", .{});
+                try stdout.flush();
+            } else if (std.mem.eql(u8, choice, "2")) {
+                try stdout.print(">> Adding...\n", .{});
+                try stdout.flush();
+            } else if (std.mem.eql(u8, choice, "3")) {
+                try stdout.print(">> Deleting...\n", .{});
+                try stdout.flush();
+            } else if (std.mem.eql(u8, choice, "4")) {
+                try stdout.print(">> Searching...\n", .{});
+                try stdout.flush();
+            } else if (std.mem.eql(u8, choice, "5")) {
+                try stdout.print("Goodbye!\n", .{});
+                try stdout.flush();
+                break;
+            } else {
+                try stdout.print("Invalid: '{s}' len={d}\n", .{ choice, choice.len });
+                try stdout.flush();
+            }
+        } else |err| switch (err) {
+            error.EndOfStream  => break,
+            error.StreamTooLong => try stdout.print("Input too long\n", .{}),
+            else => return err,
+        }
     }
 }
-
-fn one(cmd: []const u8) void{
-    print("{s}\n", .{cmd});
-}
-
-fn two(cmd: []const u8) void{
-    print("{s}\n", .{cmd});
-}
-
-fn three(cmd: [] const u8) void{
-    print("{s}\n", .{cmd});
-}
-
