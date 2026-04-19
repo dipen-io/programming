@@ -1,4 +1,5 @@
 const std = @import("std");
+const print = std.debug.print;
 
 const Contact = struct {
     name: [] const u8,
@@ -6,71 +7,66 @@ const Contact = struct {
     email: [] const u8,
 };
 
+const argEnum = enum{
+    one,
+    two,
+    three
+};
+
 const CSV_FILE = "contacts.csv";
 
 
 pub fn main(init: std.process.Init) !void {
-    const gpa = init.gpa;
-    const io = init.io;
 
-    const args = try init.minimal.args.toSlice(init.arena.allocator());
-    if (args.len < 2) {
-        printUsage();
+    // gives free allocator
+    const arena = init.arena.allocator();
+
+    // gives all args as a slice
+    const args = try init.minimal.args.toSlice(arena);
+
+    // because arg[0] gives program name and i don't want it
+    // using for
+
+    print("FOR:\n", .{});
+    for (args[1..]) |arg| {
+        print("executing command : {s}\n", .{arg});
+        if (std.mem.eql(u8, arg, "one")) {
+            one(arg);
+        }
+        else if (std.mem.eql(u8, arg, "two")) {
+            two(arg);
+        }
+        else if (std.mem.eql(u8, arg, "three")) {
+            three(arg);
+        }
+        else {
+            print("Unknonw Command\n", .{});
+        }
+    }
+
+    // using switch (you can't direclty use switch on string)
+    const arg = args[1];
+    const cmd = std.meta.stringToEnum(argEnum, arg) orelse {
+        print("Unknonw command: {s}\n", .{arg});
         return;
-    }
-
-    const command = args[1];
-
-    if (std.mem.eql(u8, command, "list")) {
-        try listContacts(gpa);
-    }  else if (std.mem.eql(u8, command, "add")) {
-        if (args.len < 3) {
-            std.debug.print("Usage: add <name> <phone> <emai> \n", .{});
-            return;
-        }
-        try addContact(gpa,  io, args[2], args[3], args[4]);
-    } else if (std.mem.eql(u8, command, "search")) {
-        if (args < 3) {
-            std.debug.print("Usage: search :<name> \n", .{});
-            return;
-        }
-        try searchContact(gpa, args[2]);
-    } else if (std.mem.eql(u8, command, "delete")) {
-        if (args.len < 3) {
-            std.debug.print("Usage: delete <name>\n", .{});
-            return;
-        }
-        try deleteContact(gpa, args[2]);
-    } else {
-        printUsage();
+    };
+    print("SWITCH\n", .{});
+    switch (cmd) {
+        .one => one(arg),
+        .two => two(arg), 
+        .three => three(arg), 
     }
 }
 
-fn printUsage() void{}
-fn listContacts(allocator : std.mem.Allocator) !void{
-    std.debug.print("Listing contacts using allocator: {*}\n",.{allocator});
+fn one(cmd: []const u8) void{
+    print("{s}\n", .{cmd});
 }
 
-fn addContact(
-    allocator: std.mem.Allocator,
-    io: std.Io,
-    name : []const u8,
-    phone : []const u8,
-    email: []const u8)
-    !void{
+fn two(cmd: []const u8) void{
+    print("{s}\n", .{cmd});
+}
 
-        // 1. create the struct (stack allocated)
-        const new_entry = Contact {
-            .name = name,
-            .phone = phone,
-            .email = email
-        };
+fn three(cmd: [] const u8) void{
+    print("{s}\n", .{cmd});
+}
 
-        // 2. Open the file in append mode
-        const file = try io.openFile(CSV_FILE, .{ .mode = .read_write, .action = .open_or_create });
-        defer file.close(io);
-
-    }
-
-fn searchContact() void{}
-fn deleteContact() void{}
