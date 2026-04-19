@@ -1,12 +1,6 @@
 const std = @import("std");
 const print = std.debug.print;
 
-const Contact = struct {
-    name: [] const u8,
-    phone: [] const u8,
-    email: [] const u8,
-};
-
 const argEnum = enum{
     one,
     two,
@@ -33,7 +27,7 @@ pub fn main(init: std.process.Init) !void {
         if (std.mem.eql(u8, arg, "one")) {
             one(arg);
         }
-        else if (std.mem.eql(u8, arg, "two")) {
+        else if (std.mem.eql(u8, arg, "ls")) {
             two(arg);
         }
         else if (std.mem.eql(u8, arg, "three")) {
