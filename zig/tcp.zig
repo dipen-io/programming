@@ -24,8 +24,9 @@ pub fn main(init: std.process.Init) !void {
     std.debug.print("Listening on 127.0.0.1: {d}\n", .{port});
 
     while (true) {
-        var conn = try server.accept(io);
-        defer conn.close(io);
+        const conn = try server.accept(io);
+
+        // defer conn.close(io);
 
         // spanw new connection
         const thread = try std.Thread.spawn(.{}, handleClient, .{ClientContext{
