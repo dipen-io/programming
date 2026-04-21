@@ -3,6 +3,7 @@ const print = std.debug.print;
 
 pub fn main() !void {
     const n_age = 1;
+    // swtich with range
     switch (n_age) {
         0...3 => {
             print("you are baby", .{});
@@ -20,4 +21,14 @@ pub fn main() !void {
             print("invalid age", .{});
         },
     }
+
+    // without range
+    const n_code = 404;
+    const s_response = switch (n_code) {
+        200 => "Page found",
+        301 => "Redirect",
+        404 => "Not Found",
+        else => "unknown error",
+    };
+    print("\nThe address responded with: {d} '{s}'.\n", .{ n_code, s_response });
 }
