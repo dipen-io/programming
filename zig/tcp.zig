@@ -6,12 +6,16 @@ const port: u32 = 5800;
 const ClientContext = struct { conn: net.Stream, io: std.Io };
 
 pub fn main(init: std.process.Init) !void {
-    // main single thread
-    var threaded: std.Io.Threaded = .init_single_threaded;
-    defer threaded.deinit();
-
     _ = init;
-    const io = threaded.io();
+    // main single thread
+    // var threaded: std.Io.Threaded = .init_single_threaded;
+    const T = std.heap.DebugAllocator(.{});
+    var debug_alloc_instace = T{ .backing_allocator = std.heap.page_allocator };
+    const allocator = debug_alloc_instace.allocator();
+    //making multi thread
+    var mThreaded = std.Io.Threaded.init(allocator, .{});
+    defer mThreaded.deinit();
+    const io = mThreaded.io();
 
     const addr = try net.IpAddress.parseIp4("127.0.0.1", port);
 
@@ -26,9 +30,7 @@ pub fn main(init: std.process.Init) !void {
     while (true) {
         const conn = try server.accept(io);
 
-        // defer conn.close(io);
-
-        // spanw new connection
+        // spawn new connection
         const thread = try std.Thread.spawn(.{}, handleClient, .{ClientContext{
             .conn = conn,
             .io = io,
@@ -42,7 +44,10 @@ pub fn main(init: std.process.Init) !void {
 fn handleClient(ctx: ClientContext) void {
     var conn = ctx.conn;
     const io = ctx.io;
-    defer conn.close(io);
+    defer {
+        conn.close(io);
+        std.debug.print("Client disconnected on thread: {}\n", .{std.Thread.getCurrentId()});
+    }
 
     std.debug.print("Client connected on thread: {}\n", .{std.Thread.getCurrentId()});
     var write_buf: [4096]u8 = undefined;
@@ -58,17 +63,25 @@ fn handleClient(ctx: ClientContext) void {
     // Echo loop
     while (true) {
         const line = reader.interface.takeDelimiterExclusive('\n') catch return;
-        const trimmed = std.mem.trimStart(u8, line, "\r\n ");
+
+        // const trimmed = std.mem.trimStart(u8, line, "\r\n ");
+        const trimmed = std.mem.trim(u8, line, " \r\n\t");
 
         if (std.mem.eql(u8, trimmed, "quit")) {
             writer.interface.writeAll("Goodbye!\n") catch return;
-            writer.interface.flush() catch return;
+            writer.interface.flush() catch |err| {
+                std.debug.print("Write error: {}\n", .{err});
+                return;
+            };
             return;
         }
 
         writer.interface.writeAll("Echo: ") catch return;
         writer.interface.writeAll(trimmed) catch return;
         writer.interface.writeAll("\n") catch return;
-        writer.interface.flush() catch return;
+        writer.interface.flush() catch |err| {
+            std.debug.print("Write error: {}\n", .{err});
+            return;
+        };
     }
 }
