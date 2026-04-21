@@ -9,10 +9,11 @@ pub fn main(init: std.process.Init) !void {
     _ = init;
     // main single thread
     // var threaded: std.Io.Threaded = .init_single_threaded;
+
     const T = std.heap.DebugAllocator(.{});
     var debug_alloc_instace = T{ .backing_allocator = std.heap.page_allocator };
     const allocator = debug_alloc_instace.allocator();
-    //making multi thread
+    //making mean thread multi thread
     var mThreaded = std.Io.Threaded.init(allocator, .{});
     defer mThreaded.deinit();
     const io = mThreaded.io();
@@ -62,7 +63,14 @@ fn handleClient(ctx: ClientContext) void {
 
     // Echo loop
     while (true) {
-        const line = reader.interface.takeDelimiterExclusive('\n') catch return;
+        const line = reader.interface.takeDelimiterExclusive('\n') catch |err| {
+            if (err == error.EndOfStream) {
+                std.debug.print("Client disconnected gracefully (EOF).\n", .{});
+            } else {
+                std.debug.print("Connection dropped with error: {}\n", .{err});
+            }
+            return;
+        };
 
         // const trimmed = std.mem.trimStart(u8, line, "\r\n ");
         const trimmed = std.mem.trim(u8, line, " \r\n\t");
