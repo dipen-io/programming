@@ -31,4 +31,13 @@ pub fn main() !void {
         else => "unknown error",
     };
     print("\nThe address responded with: {d} '{s}'.\n", .{ n_code, s_response });
+
+    // switch with capture
+    const t_resp = switch (n_code) {
+        200...399 => |n_c| .{ n_c, "Page exists or is being redirected" },
+        400...499 => |n_c| .{ n_c, "Client error" },
+        500...599 => |n_c| .{ n_c, "Server error" },
+        else => |n_c| .{ n_c, "Unknown error" },
+    };
+    print("The address responded with: {d} - '{s}'.\n", t_resp);
 }
