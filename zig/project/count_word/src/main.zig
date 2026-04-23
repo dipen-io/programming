@@ -18,8 +18,9 @@ pub fn main(init: std.process.Init) !void {
 
     // accessing the filename
     const filename = args[1];
-    const total_words = count_words.countWords(filename, io);
-    std.debug.print("Words: {!d} \n", .{total_words});
+    const result = try count_words.analyze(filename, io);
+    std.debug.print("Words: {d} \n", .{result.words});
+    std.debug.print("Letters: {d} \n", .{result.letters});
 
 
     // In order to do I/O operations need an `Io` instance.
