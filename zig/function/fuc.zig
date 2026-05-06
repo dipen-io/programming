@@ -8,10 +8,12 @@ fn greet() void {
 fn greetPerson(name: []const u8) void {
     std.debug.print("greeting...{s}\n", .{name});
 }
-// with return value
+// with return value (explicit return)
 fn add(a: i32, b: i32) i32 {
     return a + b;
 }
+
+// i don't know about implicit return type yet
 
 pub fn main() void {
     greet();
