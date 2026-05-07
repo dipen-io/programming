@@ -3,7 +3,7 @@ const Io = std.Io;
 
 const hello = @import("hello");
 
-fn greet(name:[]const u8) void {
+fn greet(name:[]const u8) !void {
     std.debug.print("greeting {s}\n", .{name});
 }
 
@@ -31,6 +31,10 @@ pub fn main(init: std.process.Init) !void {
     try stdout_writer.print("Hello World \n", .{});
 
     // try writer.print("Run `zig build test` to run the tests.\n", .{});
+    if (args.len < 2) {
+        std.debug.print("Error: Missing name parameter.\nUsage: ./program <name>\n", .{});
+        return error.MissingArgument;
+    }
 
     greet(args[1])catch|err| {
         std.debug.print("invalid name {}\n", .{err});
