@@ -1,0 +1,522 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&display=swap');
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body, .root { font-family: 'Space Grotesk', sans-serif; }
+  
+  .header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 1.5rem 0 1rem;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+    margin-bottom: 1.5rem;
+  }
+  .logo {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: #F7A41D; display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 18px; color: #1a1a1a;
+  }
+  .header-text h1 { font-size: 20px; font-weight: 700; color: var(--color-text-primary); }
+  .header-text p { font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; }
+
+  .tier-tabs {
+    display: flex; gap: 8px; margin-bottom: 1.5rem; flex-wrap: wrap;
+  }
+  .tab {
+    padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;
+    border: 0.5px solid var(--color-border-secondary); cursor: pointer;
+    background: var(--color-background-primary); color: var(--color-text-secondary);
+    transition: all 0.15s;
+  }
+  .tab:hover { background: var(--color-background-secondary); }
+  .tab.active { background: #F7A41D; color: #1a1a1a; border-color: #F7A41D; }
+
+  .projects-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;
+  }
+  .project-card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .project-card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+  .project-card.beginner::before { background: #22c55e; }
+  .project-card.intermediate::before { background: #F7A41D; }
+  .project-card.advanced::before { background: #ef4444; }
+  .project-card.expert::before { background: #8b5cf6; }
+  .project-card:hover {
+    border-color: var(--color-border-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  .project-card.selected {
+    border-color: #F7A41D;
+    box-shadow: 0 0 0 2px rgba(247,164,29,0.2);
+  }
+  .card-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--color-text-tertiary); margin-bottom: 6px;
+  }
+  .card-title { font-size: 14px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 4px; line-height: 1.3; }
+  .card-desc { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+  .card-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; }
+  .tag {
+    font-size: 10px; padding: 2px 7px; border-radius: 10px;
+    background: var(--color-background-secondary);
+    color: var(--color-text-secondary);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .readme-panel {
+    margin-top: 1.5rem;
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-secondary);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+  }
+  .readme-header {
+    background: var(--color-background-secondary);
+    padding: 10px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+  }
+  .readme-filename {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    color: var(--color-text-primary); font-weight: 500;
+  }
+  .readme-body {
+    padding: 1.25rem 1.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px; line-height: 1.8;
+    color: var(--color-text-primary);
+    white-space: pre-wrap;
+    max-height: 420px; overflow-y: auto;
+  }
+  .readme-body .md-h1 { font-size: 18px; font-weight: 700; color: #F7A41D; margin-bottom: 4px; }
+  .readme-body .md-h2 { font-size: 14px; font-weight: 600; color: var(--color-text-primary); margin-top: 16px; margin-bottom: 4px; border-bottom: 0.5px solid var(--color-border-tertiary); padding-bottom: 4px; }
+  .readme-body .md-h3 { font-size: 13px; font-weight: 600; color: var(--color-text-secondary); margin-top: 10px; }
+  .readme-body .md-code { background: var(--color-background-tertiary); padding: 8px 12px; border-radius: 6px; display: block; margin: 8px 0; border-left: 2px solid #F7A41D; }
+  .readme-body .md-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-right: 4px; }
+  
+  .copy-btn {
+    font-size: 12px; padding: 4px 10px; border-radius: 6px;
+    border: 0.5px solid var(--color-border-secondary);
+    background: var(--color-background-primary);
+    color: var(--color-text-secondary); cursor: pointer;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .copy-btn:hover { background: var(--color-background-secondary); }
+
+  .empty-state {
+    text-align: center; padding: 3rem 1rem;
+    color: var(--color-text-tertiary); font-size: 14px;
+  }
+  .empty-state .icon { font-size: 32px; margin-bottom: 8px; opacity: 0.4; }
+  
+  .stats-bar {
+    display: flex; gap: 16px; margin-bottom: 1.5rem; flex-wrap: wrap;
+  }
+  .stat { font-size: 13px; color: var(--color-text-secondary); }
+  .stat strong { color: var(--color-text-primary); }
+</style>
+
+<h2 class="sr-only">Zig Programming Language Mastery Roadmap — Project-based learning curriculum from beginner to expert</h2>
+
+<div class="header">
+  <div class="logo">Z</div>
+  <div class="header-text">
+    <h1>Zig Mastery Roadmap</h1>
+    <p>16 projects · beginner → expert · click any card to generate README</p>
+  </div>
+</div>
+
+<div class="tier-tabs" id="tabs">
+  <button class="tab active" data-tier="all">All projects</button>
+  <button class="tab" data-tier="beginner">🟢 Beginner</button>
+  <button class="tab" data-tier="intermediate">🟡 Intermediate</button>
+  <button class="tab" data-tier="advanced">🔴 Advanced</button>
+  <button class="tab" data-tier="expert">🟣 Expert</button>
+</div>
+
+<div class="stats-bar">
+  <span class="stat"><strong>16</strong> total projects</span>
+  <span class="stat"><strong>4</strong> tiers</span>
+  <span class="stat"><strong>~6 months</strong> to complete</span>
+</div>
+
+<div class="projects-grid" id="grid"></div>
+
+<div class="readme-panel" id="readme-panel" style="display:none;">
+  <div class="readme-header">
+    <span class="readme-filename" id="readme-filename">README.md</span>
+    <button class="copy-btn" id="copy-btn">copy raw</button>
+  </div>
+  <div class="readme-body" id="readme-body"></div>
+</div>
+
+<script>
+const projects = [
+  {
+    id: 1, tier: 'beginner',
+    title: 'Hello, Zig!',
+    desc: 'Basic I/O, variables, and the build system',
+    tags: ['std.io', 'build.zig', 'types'],
+    readme: {
+      title: '# Hello, Zig! 👋',
+      badges: ['beginner', 'project-01'],
+      overview: 'Your first Zig program. Learn the build system, basic types, standard I/O, and the Zig philosophy of explicit error handling.',
+      concepts: ['`const` vs `var` declarations', '`std.debug.print` and `std.io`', '`build.zig` and `zig build`', 'Zig\'s type inference', 'Comptime basics'],
+      structure: 'hello-zig/\n├── build.zig\n└── src/\n    └── main.zig',
+      run: 'zig build run',
+      tasks: ['Print "Hello, World!" to stdout', 'Accept a name from stdin and greet the user', 'Print integers, floats, booleans with formatting', 'Use `@TypeOf()` to inspect types at comptime'],
+      challenge: 'Make a mini calculator that reads two numbers and an operator from stdin.'
+    }
+  },
+  {
+    id: 2, tier: 'beginner',
+    title: 'FizzBuzz & Control Flow',
+    desc: 'Loops, conditionals, and switch expressions',
+    tags: ['loops', 'switch', 'comptime'],
+    readme: {
+      title: '# FizzBuzz & Control Flow',
+      badges: ['beginner', 'project-02'],
+      overview: 'Master Zig\'s control flow constructs. Zig\'s `switch` is an expression, loops have labels, and there is no implicit fallthrough.',
+      concepts: ['`while`, `for` loops with ranges', '`switch` as expression', 'Labeled breaks and continues', 'Comptime `switch` on types'],
+      structure: 'fizzbuzz/\n├── build.zig\n└── src/\n    └── main.zig',
+      run: 'zig build run',
+      tasks: ['Classic FizzBuzz 1–100', 'Fizzbuzz with comptime-configurable divisors', 'Use labeled loops for a grid iteration', 'Switch on an enum to dispatch actions'],
+      challenge: 'Implement a comptime FizzBuzz that generates output as a string literal at compile time.'
+    }
+  },
+  {
+    id: 3, tier: 'beginner',
+    title: 'Slice & Array Toolkit',
+    desc: 'Arrays, slices, sentinel-terminated, and strings',
+    tags: ['slices', 'arrays', 'strings'],
+    readme: {
+      title: '# Slice & Array Toolkit',
+      badges: ['beginner', 'project-03'],
+      overview: 'Zig has no hidden allocations. Understand the difference between arrays, slices, and pointers. Strings are just `[]const u8`.',
+      concepts: ['Fixed arrays vs slices', 'Sentinel-terminated arrays `[*:0]u8`', 'String literals and UTF-8', '`std.mem` utilities', 'Pointer arithmetic'],
+      structure: 'slices/\n├── build.zig\n└── src/\n    └── main.zig',
+      run: 'zig build run',
+      tasks: ['Reverse a slice in-place', 'Implement `contains`, `indexOf`, `split` on strings', 'Count UTF-8 codepoints (not bytes)', 'Write a type-generic `sum([]T)` function'],
+      challenge: 'Build a simple string interning pool using a fixed-size buffer.'
+    }
+  },
+  {
+    id: 4, tier: 'beginner',
+    title: 'Error Handling Playground',
+    desc: 'Error sets, try, catch, and error unions',
+    tags: ['errors', 'try', 'catch'],
+    readme: {
+      title: '# Error Handling Playground',
+      badges: ['beginner', 'project-04'],
+      overview: 'Zig has no exceptions. Errors are values. Error unions are part of the type system. Learn to propagate and handle errors explicitly.',
+      concepts: ['Error sets and `anyerror`', '`try` keyword (syntactic sugar for `catch |err| return err`)', '`catch` with payload capture', '`errdefer` for cleanup', 'Error return traces'],
+      structure: 'errors/\n├── build.zig\n└── src/\n    └── main.zig',
+      run: 'zig build run',
+      tasks: ['Write a `parseInt` that returns `error.InvalidCharacter`', 'Chain multiple fallible operations with `try`', 'Use `errdefer` to release a resource on failure', 'Define a custom error set for a file parser'],
+      challenge: 'Parse a simple `.ini` config file and return structured errors with context.'
+    }
+  },
+  {
+    id: 5, tier: 'intermediate',
+    title: 'Memory Allocator Tour',
+    desc: 'Allocators, arena, fixed-buffer, and GPA',
+    tags: ['allocators', 'heap', 'arena'],
+    readme: {
+      title: '# Memory Allocator Tour',
+      badges: ['intermediate', 'project-05'],
+      overview: 'Zig passes allocators explicitly — there is no hidden malloc. Understand the Allocator interface and when to use Arena, FixedBuffer, or GeneralPurpose.',
+      concepts: ['`std.mem.Allocator` interface', '`std.heap.GeneralPurposeAllocator`', '`std.heap.ArenaAllocator`', '`std.heap.FixedBufferAllocator`', 'Detecting memory leaks with GPA'],
+      structure: 'allocators/\n├── build.zig\n└── src/\n    ├── main.zig\n    └── bench.zig',
+      run: 'zig build run\nzig build bench',
+      tasks: ['Allocate and free a dynamic array', 'Use ArenaAllocator for a request lifecycle', 'Detect a leak with GeneralPurposeAllocator', 'Benchmark Arena vs GPA for many small allocs'],
+      challenge: 'Implement a bump/stack allocator from scratch using a fixed buffer.'
+    }
+  },
+  {
+    id: 6, tier: 'intermediate',
+    title: 'Linked List & Collections',
+    desc: 'Generic data structures with comptime types',
+    tags: ['generics', 'comptime', 'structs'],
+    readme: {
+      title: '# Linked List & Collections',
+      badges: ['intermediate', 'project-06'],
+      overview: 'Zig achieves generics through comptime. Write a `List(T)` where `T` is a comptime parameter. Implement stack, queue, and linked list.',
+      concepts: ['`comptime` type parameters', '`fn Stack(comptime T: type) type`', 'Optional pointers `?*Node`', 'Allocator-aware data structures', '`std.ArrayList` and `std.HashMap`'],
+      structure: 'collections/\n├── build.zig\n└── src/\n    ├── main.zig\n    ├── stack.zig\n    ├── queue.zig\n    └── linked_list.zig',
+      run: 'zig build run\nzig build test',
+      tasks: ['Generic Stack(T) with push/pop', 'Singly linked list with allocator', 'Queue backed by circular buffer', 'Use `std.ArrayList` and `std.AutoHashMap`'],
+      challenge: 'Build a type-safe `TypedArena(T)` that only stores one type of value.'
+    }
+  },
+  {
+    id: 7, tier: 'intermediate',
+    title: 'File I/O & JSON Parser',
+    desc: 'Reading files, streams, and parsing JSON',
+    tags: ['std.fs', 'std.json', 'parsing'],
+    readme: {
+      title: '# File I/O & JSON Parser',
+      badges: ['intermediate', 'project-07'],
+      overview: 'Read and write files using `std.fs`. Use `std.json` to parse and serialize data. Build a small config reader.',
+      concepts: ['`std.fs.cwd().openFile()`', 'Buffered readers and writers', '`std.json.parseFromSlice`', 'Struct serialization with `std.json.stringify`', 'Memory-mapped files'],
+      structure: 'json-config/\n├── build.zig\n├── config.json\n└── src/\n    └── main.zig',
+      run: 'zig build run',
+      tasks: ['Read a text file line by line', 'Parse a JSON config into a Zig struct', 'Write a modified struct back to JSON', 'Handle missing fields with defaults'],
+      challenge: 'Build a streaming JSON parser that handles files larger than available RAM.'
+    }
+  },
+  {
+    id: 8, tier: 'intermediate',
+    title: 'Multithreading & Atomics',
+    desc: 'Threads, mutexes, and atomic operations',
+    tags: ['threads', 'mutex', 'atomic'],
+    readme: {
+      title: '# Multithreading & Atomics',
+      badges: ['intermediate', 'project-08'],
+      overview: 'Zig provides OS threads via `std.Thread`. No async runtime — real threads with explicit synchronization. Learn mutexes, atomics, and thread pools.',
+      concepts: ['`std.Thread.spawn`', '`std.Thread.Mutex` and `RwLock`', '`std.atomic.Value(T)`', 'Thread-safe queues', 'Memory ordering'],
+      structure: 'threads/\n├── build.zig\n└── src/\n    ├── main.zig\n    ├── pool.zig\n    └── channel.zig',
+      run: 'zig build run',
+      tasks: ['Parallel sum of a large array', 'Producer-consumer with a Mutex-protected queue', 'Atomic reference counter', 'Simple thread pool with a work queue'],
+      challenge: 'Implement a lock-free MPSC (multi-producer single-consumer) queue.'
+    }
+  },
+  {
+    id: 9, tier: 'advanced',
+    title: 'TCP Echo Server',
+    desc: 'Sockets, networking, and protocol design',
+    tags: ['sockets', 'networking', 'posix'],
+    readme: {
+      title: '# TCP Echo Server',
+      badges: ['advanced', 'project-09'],
+      overview: 'Build a TCP server from POSIX sockets. Handle multiple clients with threads. Learn about backpressure, framing, and protocol design.',
+      concepts: ['`std.net.StreamServer`', 'Accept loops and client handling', 'Length-prefixed message framing', 'Graceful shutdown with signals', '`SO_REUSEADDR` and socket options'],
+      structure: 'tcp-server/\n├── build.zig\n└── src/\n    ├── main.zig\n    ├── server.zig\n    └── client.zig',
+      run: 'zig build run\n# In another terminal:\nnc localhost 8080',
+      tasks: ['Single-threaded echo server', 'Multi-client with one thread per connection', 'Length-prefixed framing protocol', 'Graceful shutdown on SIGINT'],
+      challenge: 'Add a simple line-based protocol with commands: PING, ECHO, QUIT, STATS.'
+    }
+  },
+  {
+    id: 10, tier: 'advanced',
+    title: 'Comptime Metaprogramming',
+    desc: 'Type-level computation, reflection, and codegen',
+    tags: ['comptime', 'reflection', '@typeInfo'],
+    readme: {
+      title: '# Comptime Metaprogramming',
+      badges: ['advanced', 'project-10'],
+      overview: 'Zig\'s comptime is more powerful than C++ templates. Use `@typeInfo`, `@field`, and inline for-loops to generate code at compile time.',
+      concepts: ['`@typeInfo` and `std.meta`', '`inline for` over struct fields', 'Comptime string maps', '`@embedFile` for data', 'Type-erased interfaces with vtables'],
+      structure: 'comptime/\n├── build.zig\n└── src/\n    ├── main.zig\n    ├── serializer.zig\n    └── router.zig',
+      run: 'zig build run',
+      tasks: ['Auto-serialize any struct to key=value format', 'Build a comptime string-to-function router', 'Generate an enum from a CSV at compile time', 'Implement a tagged union visitor pattern'],
+      challenge: 'Build a comptime SQL query builder that validates column names against a schema type.'
+    }
+  },
+  {
+    id: 11, tier: 'advanced',
+    title: 'WASM Module',
+    desc: 'Compile Zig to WebAssembly, call from JS',
+    tags: ['wasm', 'freestanding', 'interop'],
+    readme: {
+      title: '# WASM Module',
+      badges: ['advanced', 'project-11'],
+      overview: 'Zig is an excellent WASM compiler. Target `wasm32-freestanding` for minimal output. Export functions and share memory with JavaScript.',
+      concepts: ['`-target wasm32-freestanding`', 'Exporting functions with `export`', 'Linear memory and JS interop', 'No libc WASM builds', 'WASI target for server-side WASM'],
+      structure: 'wasm-module/\n├── build.zig\n├── index.html\n├── loader.js\n└── src/\n    └── main.zig',
+      run: 'zig build\n# Serve with any HTTP server:\nnpx serve .',
+      tasks: ['Export `add(i32, i32) i32` to JS', 'Pass a string from JS via shared memory', 'Implement image pixel manipulation in Zig', 'Build a WASI CLI tool'],
+      challenge: 'Implement a fractal renderer (Mandelbrot) in Zig WASM with a canvas frontend.'
+    }
+  },
+  {
+    id: 12, tier: 'advanced',
+    title: 'Custom Allocator',
+    desc: 'Build a slab, pool, or buddy allocator',
+    tags: ['allocator', 'memory', 'systems'],
+    readme: {
+      title: '# Custom Allocator',
+      badges: ['advanced', 'project-12'],
+      overview: 'Implement the `std.mem.Allocator` interface from scratch. Build a slab allocator for fixed-size objects and benchmark against the GPA.',
+      concepts: ['`std.mem.Allocator` vtable', 'Slab allocator design', 'Alignment and padding', 'Fragmentation analysis', 'Integration with Zig\'s allocator ecosystem'],
+      structure: 'custom-alloc/\n├── build.zig\n└── src/\n    ├── main.zig\n    ├── slab.zig\n    └── bench.zig',
+      run: 'zig build bench',
+      tasks: ['Implement `allocator()` returning `std.mem.Allocator`', 'Slab allocator for a fixed size', 'Pool allocator for a specific struct type', 'Benchmark vs ArenaAllocator'],
+      challenge: 'Implement a buddy allocator that supports arbitrary sizes with O(log n) alloc/free.'
+    }
+  },
+  {
+    id: 13, tier: 'expert',
+    title: 'HTTP/1.1 Server',
+    desc: 'Full HTTP server: parsing, routing, middleware',
+    tags: ['http', 'parser', 'server'],
+    readme: {
+      title: '# HTTP/1.1 Server',
+      badges: ['expert', 'project-13'],
+      overview: 'Build a production-capable HTTP/1.1 server in pure Zig. Implement request parsing, routing, response building, and keep-alive.',
+      concepts: ['HTTP/1.1 spec compliance', 'Incremental request parsing', 'Trie-based router', 'Connection keep-alive', 'Transfer-Encoding: chunked'],
+      structure: 'http-server/\n├── build.zig\n└── src/\n    ├── main.zig\n    ├── server.zig\n    ├── request.zig\n    ├── response.zig\n    └── router.zig',
+      run: 'zig build run\ncurl http://localhost:8080/',
+      tasks: ['Parse HTTP/1.1 request line and headers', 'Route GET/POST to handlers', 'Serve static files with correct MIME types', 'Connection keep-alive with timeout'],
+      challenge: 'Add WebSocket upgrade support with a simple broadcast chat room.'
+    }
+  },
+  {
+    id: 14, tier: 'expert',
+    title: 'LLVM IR Emitter / Toy Compiler',
+    desc: 'Lexer, parser, AST, and code generation',
+    tags: ['compiler', 'AST', 'codegen'],
+    readme: {
+      title: '# Toy Compiler',
+      badges: ['expert', 'project-14'],
+      overview: 'Build a compiler for a tiny language (arithmetic + variables + functions) that generates LLVM IR or native code via Zig\'s codegen.',
+      concepts: ['Lexer with tagged union tokens', 'Recursive descent parser', 'AST with tagged unions', 'Semantic analysis and type checking', 'LLVM IR or Zig IR emission'],
+      structure: 'toyc/\n├── build.zig\n└── src/\n    ├── main.zig\n    ├── lexer.zig\n    ├── parser.zig\n    ├── ast.zig\n    ├── sema.zig\n    └── codegen.zig',
+      run: 'zig build run -- examples/hello.toy',
+      tasks: ['Lexer for numbers, operators, identifiers', 'Parse expressions with precedence climbing', 'AST evaluation (tree-walk interpreter)', 'Type-check function arguments'],
+      challenge: 'Add a bytecode VM backend with a simple stack machine.'
+    }
+  },
+  {
+    id: 15, tier: 'expert',
+    title: 'Linux Kernel Module (via C interop)',
+    desc: 'Zig + C FFI, syscalls, and bare-metal',
+    tags: ['ffi', 'C interop', 'syscalls'],
+    readme: {
+      title: '# Linux Syscall Layer & C Interop',
+      badges: ['expert', 'project-15'],
+      overview: 'Use Zig\'s first-class C interop to wrap Linux syscalls without libc. Build a minimal runtime and call C libraries from Zig seamlessly.',
+      concepts: ['`@cImport` and `translate-c`', 'Linking against C libraries', '`extern fn` declarations', 'Raw syscalls with `std.os.linux`', 'Freestanding targets'],
+      structure: 'syscall-layer/\n├── build.zig\n├── c/\n│   └── helper.c\n└── src/\n    ├── main.zig\n    └── syscall.zig',
+      run: 'zig build run',
+      tasks: ['Call `write` syscall directly without libc', 'Wrap a C library with a Zig API', 'Use `@cImport` to bind to libcurl', 'Build a freestanding x86_64 bootloader stub'],
+      challenge: 'Write a minimal ELF loader in Zig that can load and execute a static binary.'
+    }
+  },
+  {
+    id: 16, tier: 'expert',
+    title: 'Database Engine',
+    desc: 'B-tree, WAL, query executor, and storage',
+    tags: ['btree', 'storage', 'WAL'],
+    readme: {
+      title: '# Embeddable Database Engine',
+      badges: ['expert', 'project-16'],
+      overview: 'The capstone project. Build a simple but real embeddable key-value database with a B-tree index, write-ahead log for durability, and a basic query API.',
+      concepts: ['B-tree insert, search, split', 'Write-Ahead Log (WAL)', 'Page cache with LRU eviction', 'MVCC basics', 'File format design'],
+      structure: 'zigdb/\n├── build.zig\n└── src/\n    ├── main.zig\n    ├── btree.zig\n    ├── wal.zig\n    ├── pager.zig\n    ├── cache.zig\n    └── query.zig',
+      run: 'zig build run',
+      tasks: ['B-tree node with insert and search', 'Pager: read/write pages to disk', 'Write-ahead log for crash recovery', 'LRU page cache', 'Simple query: GET key, SET key value, DELETE key'],
+      challenge: 'Add a range-scan iterator that traverses the B-tree leaves in order.'
+    }
+  }
+];
+
+const tierColors = {
+  beginner: '#22c55e',
+  intermediate: '#F7A41D',
+  advanced: '#ef4444',
+  expert: '#8b5cf6'
+};
+
+let currentTier = 'all';
+let selectedId = null;
+
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  const filtered = currentTier === 'all' ? projects : projects.filter(p => p.tier === currentTier);
+  grid.innerHTML = filtered.map(p => `
+    <div class="project-card ${p.tier} ${selectedId === p.id ? 'selected' : ''}" onclick="selectProject(${p.id})">
+      <div class="card-num">#${String(p.id).padStart(2,'0')} · ${p.tier}</div>
+      <div class="card-title">${p.title}</div>
+      <div class="card-desc">${p.desc}</div>
+      <div class="card-tags">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+    </div>
+  `).join('');
+}
+
+function renderReadme(p) {
+  const r = p.readme;
+  const panel = document.getElementById('readme-panel');
+  const body = document.getElementById('readme-body');
+  const fname = document.getElementById('readme-filename');
+  fname.textContent = `project-${String(p.id).padStart(2,'0')}-${p.title.toLowerCase().replace(/[^a-z0-9]+/g,'-')}/README.md`;
+  
+  const badge = `![${r.badges[0]}](https://img.shields.io/badge/level-${r.badges[0]}-${encodeURIComponent(tierColors[p.tier])}?style=flat-square)`;
+  const badge2 = `![zig](https://img.shields.io/badge/zig-0.13-F7A41D?style=flat-square&logo=zig)`;
+
+  const raw = `${r.title}
+
+${badge} ${badge2}
+
+## Overview
+${r.overview}
+
+## Concepts covered
+${r.concepts.map(c => `- ${c}`).join('\n')}
+
+## Project structure
+\`\`\`
+${r.structure}
+\`\`\`
+
+## Getting started
+\`\`\`bash
+${r.run}
+\`\`\`
+
+## Tasks
+${r.tasks.map((t,i) => `${i+1}. ${t}`).join('\n')}
+
+## Stretch challenge
+> ${r.challenge}
+`;
+
+  body.innerHTML = raw
+    .replace(/^(#{1}) (.+)$/m, '<span class="md-h1">$1 $2</span>')
+    .replace(/^(#{2}) (.+)$/gm, '<span class="md-h2">$2</span>')
+    .replace(/^(#{3}) (.+)$/gm, '<span class="md-h3">$2</span>')
+    .replace(/`([^`]+)`/g, '<code style="background:var(--color-background-tertiary);padding:1px 5px;border-radius:3px;">$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/^> (.+)$/gm, '<em style="color:var(--color-text-secondary);">💡 $1</em>');
+
+  panel.style.display = 'block';
+  
+  document.getElementById('copy-btn').onclick = () => {
+    navigator.clipboard.writeText(raw).then(() => {
+      document.getElementById('copy-btn').textContent = 'copied!';
+      setTimeout(() => document.getElementById('copy-btn').textContent = 'copy raw', 1500);
+    });
+  };
+}
+
+function selectProject(id) {
+  selectedId = id;
+  const p = projects.find(x => x.id === id);
+  renderGrid();
+  renderReadme(p);
+  document.getElementById('readme-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+document.getElementById('tabs').addEventListener('click', e => {
+  const btn = e.target.closest('.tab');
+  if (!btn) return;
+  currentTier = btn.dataset.tier;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid();
+});
+
+renderGrid();
+</script>
