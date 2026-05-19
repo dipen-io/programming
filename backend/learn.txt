@@ -1,0 +1,130 @@
+1. http vs https
+https encrypts data in trasmitting using TLS(Transport Layer Protocol), while http send data 
+as plain text - making it vulnerable to interceptors
+    * https provies authentication - veirfy you are taking to right server via ssl/tls cetificate
+     
+2. REST API
+core principle 
+    1. stateless: each req containt all the info needed; 
+    2. Client-Server: fronted baceknd seperated 
+    3. Uniform Interface: consitent url stucture
+    4. Cacheable: response can be cache 
+
+3. index
+    without index -> full table scan(check every row)
+    with index -> jump directly to the data (liek a books' index)
+    Tradeoff -> shower writes(insert/update/delete) becaus the index also needs to be updated, and 
+                indexes take extrac storage space
+
+4. authentication vs authorization
+    authentication : who u are (login, verify, identity)
+    authorization : what can u do (permission and roles)
+
+5. JWT structure
+    * Header -> algorithm(HS256)
+    * Payload -> data (id , email)
+    * Signature 
+
+6. Caching 
+    db query -> hits disk -> show
+    Redis -> stored in ram -> much faster
+
+    strategy
+        Cache-aside: check cache first, if miss -> fetch from db -> store in cache
+        TTL (Time to live) -> cache expire after a set time to to avoid stale data 
+
+    use case
+        session storage
+        rate limiting
+        Freqent read data 
+    Cache can serve stale data if db is updated but cache is not refreshed yet - called caceh invalidatio      n and is one of the harded problem in backend dev
+
+7. horizotal scaling vs verical scaling
+    verical -> make the same servier bigger/stonger
+    add more ram, cpu, storage to exiting server
+    has limit - can't upgrade forever
+    horizotal -> more server 
+    instead of one powerfull server -> run 3, 4 smaller server 
+    much more scalable for large apps
+        load balencer -> when w have multple server  the load balencer sites in front and distrucutes incomming req evenly across the all server so no single server gets overwhelmed
+
+8. database sharding ? how it is different from replication
+    DB Replication -> copy the same data across multiple serves
+        * one primary server (handle writes)
+        * multple replica server (handle read)
+        * purpose -> high availability  & read performace
+        * if primary goes down -> replica takes over
+    DB sharing -> split data across multple server 
+        * each server hold different chunk of data 
+        * example : Users A-M -> Server 1, User N-Z -> Server 2
+        * purpose handle massive amounts of data that won't fit on one server 
+    key difference
+    Replication -> same data on multiple servers (for availability) 
+    Sharding -> different data on each server (for scalibility)
+9. What is the N+1 query problem in databases? How would you solve it?
+
+    N+1 Query Problem:
+        Imagine you have Posts and each post has an Author.
+            // 1 query to get all posts
+            const posts = await Post.find() // 1 query
+
+            // Then for EACH post, you query the author separately
+            posts.forEach(post => {
+                const author = await User.findById(post.authorId) // N queries
+            })
+
+        if u have 100 posts -> 1+100  = 101 queries
+            That's the N+1 problem -> too many unecessay DB queries
+
+        how to fix : 
+            option 1 : JOIN / Populate — fetch everything in a single query
+            const posts =  await Post.find().populate('author'); 
+
+            option 2 : Eager Loading — fetch all authors at once
+            const authors = await User.find({ _id: { $in: posts.map(p => p.authorId) } })
+            // 1 query instead of N
+
+    Monolithic vs Microservice             
+        monolithic 
+            pro
+            * everything in one codebase - auth, payment, users etc
+            * simple to develop & deploy (espcially in early stage)
+            * Easier for smaller teams
+            cons
+            * hard to scale (must scale entere apps even if only one part is under load) 
+            * one bug can bring down the whole app
+        microservice
+            pro
+            * each featuer is a seperate and independent service
+            * Scale only the service that need it 
+            * one servcei goes down others keep running
+            * differnt teach stack
+            cons 
+            * complex to manage - networking , communication 
+            * hard to setup initially
+
+10 What is the CAP theorem? Explain each property and why it matters in distributed systems.
+    C: Consistency
+        * Every request gets the most recent data 
+        * All servers return the same at the same time 
+        * Example: update profile -> everyone seen the updated profile instanly
+
+    A: Availability
+        * System is always up and responding
+        * Every request gets a resposne (even if it's not the latest data)
+        * Example: Even if a server is struggling, it still responds
+
+    P: Partition Tolerance 
+        * System keeps working even if network connection between servers breaks 
+        * In real distributed systems, network failure WILL happen - so P is basically mandatory
+
+    Since P is always required, choose between
+        Choice  Means                                      Example
+        CP      Consistent but may be unavailable         Mongodb,  HBase
+        AP      Always available but may have stale data  Cassandra,DynamoDB
+
+    Simple analogy:
+        During a network failure between two ATMs — you either:
+            CP → block transactions until consistent (no wrong balance)
+            AP → allow transactions but risk showing wrong balance
+
