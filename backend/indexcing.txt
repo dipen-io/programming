@@ -1,0 +1,26 @@
+// Compound index — order matters: Equality → Sort → Range
+// Query: find by status, sort by createdAt, filter by price range
+schema.index({ status: 1, createdAt: -1, price: 1 });
+
+// Partial index — only index docs matching a filter (saves space)
+schema.index(
+  { email: 1 },
+  { partialFilterExpression: { isActive: true } } // based on condition make index
+);
+
+// Sparse index — skips docs where field is null/missing
+schema.index({ deletedAt: 1 }, { sparse: true });
+
+// TTL index — auto-expire documents
+schema.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
+
+// Text index — full-text search
+schema.index({ title: 'text', description: 'text' }, {
+  weights: { title: 10, description: 5 }, // title matches ranked higher
+  default_language: 'english'
+});
+
+// Covered query — index contains ALL fields the query needs
+// (zero doc reads, pure index scan)
+schema.index({ userId: 1, status: 1, createdAt: -1 });
+// Query: .find({ userId, status }).select('createdAt').lean() → covered ✅
