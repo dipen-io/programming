@@ -7,8 +7,8 @@ const Point = struct {
     y: i32,
 };
 
-const point: Point = Point {.x = 10, .y = 20 };
- 
+const point: Point = Point{ .x = 10, .y = 20 };
+
 //Enum define a set of possible value for a variabeonst State = enum {
 const State = enum {
     active,
@@ -20,5 +20,5 @@ const state: State = State.active;
 pub fn main() !void {
     print("value of x is: {} \n", .{point.x});
     print("value of y is: {} \n", .{point.y});
-    print("state is : {s} \n", .{@tagName(state)});
-} 
+    print("state is : {s} \n", .{@tagName(state)}); // this is how we print enum
+}

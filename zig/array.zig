@@ -2,6 +2,7 @@ const expectEqual = @import("std").testing.expectEqual;
 const assert = @import("std").debug.assert;
 const mem = @import("std").mem;
 const print = @import("std").debug.print;
+const std = @import("std");
 
 // array literal
 const message = [_]u8{ 'h', 'e', 'l', 'l', 'o' };
