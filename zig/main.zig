@@ -1,0 +1,11 @@
+const std = @import("std");
+
+pub fn main(init: std.process.Init) !void {
+    _ = init;
+    std.debug.print("Hello World\n ",. {});
+    print();
+}
+
+fn print() void {
+    std.debug.print(" Print Function \n ",. {});
+}
