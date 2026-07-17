@@ -53,5 +53,17 @@ pub fn main() void {
         },
         else => print("and everyting else.. \n", .{}),
     }
+
+
+    print("SWITCH AS EXPRESSION.............\n", .{});
+    const status: u16 = 404;
+    const message = switch (status) {
+        200 => "Success",
+        401 => "Unauthorized",
+        404 => "Not Found",
+        else => "Unknown Status",
+    };
+    print("message: {s}\n", .{message});
 }
+
 
