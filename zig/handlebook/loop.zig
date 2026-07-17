@@ -52,4 +52,25 @@ pub fn main() void {
     for (intergers, floats) |r,s| {
         std.log.debug("numbers: [{}] [{}]", .{r,s});
     }
+
+    // collection and ranges
+    for (names, 0..) |name, ii| {
+        std.log.debug("i, name: [{}]: [{s}]", .{ii, name});
+    }
+
+    // pointer to collection change
+    var samples = [_]i32{1,1,1,1,1};
+    for (&samples) |*sample| {
+        sample.* *= 2;
+    }
+
+    std.log.info("Modified array: {any}", .{samples});
+
+    const x = for (11..111) |values| {
+        if (values%31 == 0) break i;
+    } else 
+        123;
+
+    std.log.info("x: {}", .{x});
+
 }
