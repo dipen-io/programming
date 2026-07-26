@@ -11,13 +11,13 @@
 */
 
 int main() {
-    struct ifaddrs *addresses;
+    struct ifaddrs *addresses; // only declare an pointer not initialize it
     /*
-     * addresses: pointer to the struct (ifaddrs[which is na linked list]) 
+     * addresses: pointer to the structure (ifaddrs[which is an one node]) 
      */
 
     if (getifaddrs(&addresses)  == -1) {
-        printf("getifaddrs call falied\n");
+        printf("getifaddrs call failed\n");
         return -1;
     }
 
