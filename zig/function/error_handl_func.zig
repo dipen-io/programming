@@ -7,7 +7,7 @@ const MathError = error{
 };
 
 // function that my return error
-fn devide(a: i32, b: i32) MathError!i32 {
+fn divide(a: i32, b: i32) MathError!i32 {
     if (b == 0) {
         return MathError.DivisionBYZero;
     }
@@ -16,6 +16,7 @@ fn devide(a: i32, b: i32) MathError!i32 {
 
 // function with multiple possible error 
 fn squareRoot(x: i32) MathError!i32 {
+    std.debug.print("is this running" , .{});
     if (x < 0) {
         return MathError.NegativeNumber;
     }
@@ -27,11 +28,11 @@ fn squareRoot(x: i32) MathError!i32 {
 
 
 pub fn main() !void {
-    const result1 = try devide(10, 2);
+    const result1 = try divide(10, 2);
     std.debug.print("10 / 2 = {}\n", .{result1});
 
     // using catch to handle error
-    const result2 = devide(10, 0) catch |err|  {
+    const result2 = divide(10, 0) catch |err| {
         std.debug.print("Error: {}\n", .{err});
         return;
     };
@@ -46,6 +47,5 @@ pub fn main() !void {
     } else |err| {
         std.debug.print("Error calculating square root: {}\n", .{err});
     }
+    std.debug.print("{s}", .{"hello"});
 }
-
-
