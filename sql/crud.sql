@@ -39,6 +39,9 @@ CREATE TABLE categories (
     category_name VARCHAR(50) NOT NULL
 );
 
+-- order by column_name ASC/DESC
+SELECT * from categories ORDER BY category_name ASC/DESC
+
 -- 4. update products
 UPDATE products SET cat_id = 1 WHERE id = 1;
 
