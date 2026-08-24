@@ -13,6 +13,7 @@ pub fn main(init: std.process.Init) !void {
     const T = std.heap.DebugAllocator(.{});
     var debug_alloc_instace = T{ .backing_allocator = std.heap.page_allocator };
     const allocator = debug_alloc_instace.allocator();
+
     //making mean thread multi thread
     var mThreaded = std.Io.Threaded.init(allocator, .{});
     defer mThreaded.deinit();

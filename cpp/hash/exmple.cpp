@@ -13,8 +13,8 @@ int main () {
     unordered_map<string, int> score;
 
     //insert
-    score["dinesh"] = 88;
-    score.insert({"dipen", 898});
+    score["dinesh"] = 111;
+    score.insert({"dipen",898});
     score.emplace("mohon", 888);
 
     // check existence  using key
